@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_4d496e85_0d00_4e08_9d6b_2751e6377631_Input_Payload = Array<{  month9_2022: Number,   month3_2022: Number,   month11_2022: Number,   accountDimensionExternalId: String,   label: String,   month6_2022: Number,   productDimensionCategoryId: String,   month12_2022: Number,   month1_2022: Number,   productDimensionExternalId: String,   measureCode: String,   month8_2022: Number,   promotionDimensionId: String,   month4_2022: Number,   month7_2022: Number,   month10_2022: Number,   month5_2022: Number,   accountDimensionId: String,   month2_2022: Number,   _?: Any}>
+
