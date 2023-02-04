@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="b6d0781d-3dc2-4e0e-a04f-67e5b4e9d4a8">
+		<http:request-connection host="localhost" port="8084" />
+	</http:request-config>
+	<flow name="million-recordsFlow" doc:id="1a8af54c-301e-42ec-9963-58d960e54c6b" >
+		<file:listener doc:name="On New or Updated File" doc:id="912b422d-36a5-4e63-9660-846b83c51411" directory="C:\Users\HP\OneDrive\Desktop\csv" outputMimeType="application/csv">
+			<scheduling-strategy >
+				<fixed-frequency frequency="5000" timeUnit="DAYS"/>
+			</scheduling-strategy>
+		</file:listener>
+		<logger level="INFO" doc:name="Logger" doc:id="15ba78b3-6d7d-43a6-9e9d-0961f3e59aba" message='#["files read"]'/>
+		<batch:job jobName="million-recordsBatch_Job" doc:id="7cf716a1-9a09-4275-a561-6dac257365cb" >
+			<batch:process-records >
+				<batch:step name="Batch_Step" doc:id="910d62e3-9ec7-4d85-80f8-b7ac28784f20" >
+					<ee:transform doc:name="Transform Message" doc:id="f807acdc-bb05-46ff-a3d4-a179e1c5e3f4" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map (item,index) -> {
+  "accountDimensionId" : item.'accountdimension.id',
+	"productDimensionCategoryId" : item.'productdimension.categoryid',
+	"accountDimensionExternalId" : item.'accountdimension.externalid',
+	"promotionDimensionId" : item.'promotiondimension.id',
+	"productDimensionExternalId": item.'productdimension.externalid',
+	"label" : item.'label',
+	"measureCode" : item.'measurecode',
+	"month1_2022" : item.'Month-1/2022',
+	"month2_2022" : item."Month-2/2022",
+	"month3_2022" : item.'Month-3/2022',
+	"month4_2022" : item."Month-4/2022",
+	"month5_2022" : item.'Month-5/2022',
+	"month6_2022" : item."Month-6/2022",
+	"month7_2022" : item.'Month-7/2022',
+	"month8_2022" : item."Month-8/2022",
+	"month9_2022" : item.'Month-9/2022',
+	"month10_2022" : item."Month-10/2022",
+	"month11_2022" : item.'Month-11/2022',
+	"month12_2022" : item."Month-12/2022"
+}]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+					<batch:aggregator doc:name="Batch Aggregator" doc:id="fba51ca9-71ff-40b9-ada5-5932aca4152b" size="20">
+						<ee:transform doc:name="Transform Message" doc:id="da990387-8df9-42f8-95d3-c716d8eecd65" >
+							<ee:message >
+								<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+flatten(payload)]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+						<http:request method="POST" doc:name="Request" doc:id="537c078b-c78b-4335-a499-d4fde05a7ecf" config-ref="HTTP_Request_configuration" path="/api/transfer"/>
+					</batch:aggregator>
+				</batch:step>
+			</batch:process-records>
+			<batch:on-complete >
+				<logger level="INFO" doc:name="Logger" doc:id="a389c393-99d1-4840-ae31-1e65314a4a31" message="#[vars.correlationId]"/>
+			</batch:on-complete>
+		</batch:job>
+	</flow>
+</mule>
