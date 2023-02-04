@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
+	xmlns:compression="http://www.mulesoft.org/schema/mule/compression" xmlns:xml-module="http://www.mulesoft.org/schema/mule/xml-module" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mule/xml-module/current/mule-xml-module.xsd
+http://www.mulesoft.org/schema/mule/compression http://www.mulesoft.org/schema/mule/compression/current/mule-compression.xsd
+http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="get-fileFlow" doc:id="12d61aaf-f038-48ee-a4c8-f9e8a34d1468" >
+		<http:request method="GET" doc:name="retriving file" doc:id="2ca15573-a538-42a0-aaa1-649745a146d9" url="https://www.mulesoft.com/ext/solutions/draft/resources/full-load-files.csv.gz" followRedirects="true" requestStreamingMode="AUTO">
+		</http:request>
+		<compression:extract doc:name="Extract the file" doc:id="28186d2b-372a-4bae-9046-1913d109133e" >
+			<compression:extractor >
+				<compression:zip-extractor />
+			</compression:extractor>
+		</compression:extract>
+		<file:write doc:name="Write" doc:id="d307633e-9cfa-4e3b-9ae4-c0a7d15d3121" path="C:\Users\HP\OneDrive\Desktop\bigfiles.csv">
+			<file:content ><![CDATA[#[payload[1]]]]></file:content>
+		</file:write>
+	</flow>
+</mule>
